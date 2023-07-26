@@ -1,13 +1,16 @@
 import { Header } from './components/Header';
+import { Post, PostProps } from './components/Post';
 import { Sidebar } from './components/Sidebar';
-import { Post } from './components/Post';
 
 import styles from './App.module.css';
 
 import './global.css';
 
-// Create an array os posts
-const posts = [
+interface Post extends PostProps {
+  id: number;
+}
+
+const posts: Post[] = [
   {
     id: 1,
     author: {

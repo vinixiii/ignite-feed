@@ -1,15 +1,32 @@
 import { format, formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { ChangeEvent, FormEvent, InvalidEvent, useState } from 'react';
 
 import { Avatar } from '../Avatar';
 import { Comment } from '../Comment';
 
 import styles from './styles.module.css';
-import { useState } from 'react';
 
-export function Post({ author, content, publishedAt }) {
-  const [comments, setComments] = useState([]);
-  const [newCommentText, setNewCommentText] = useState('');
+interface Author {
+  avatarUrl: string;
+  name: string;
+  role: string;
+}
+
+interface Content {
+  type: 'paragraph' | 'link';
+  content: string;
+}
+
+export interface PostProps {
+  author: Author;
+  content: Content[];
+  publishedAt: Date;
+}
+
+export function Post({ author, content, publishedAt }: PostProps) {
+  const [comments, setComments] = useState<string[]>([]);
+  const [newCommentText, setNewCommentText] = useState<string>('');
 
   const formattedPublishDate = format(
     publishedAt,
@@ -24,16 +41,18 @@ export function Post({ author, content, publishedAt }) {
     addSuffix: true,
   });
 
-  function handleNewCommentChange(event) {
+  const isNewCommentEmpty = newCommentText.length === 0;
+
+  function handleNewCommentChange(event: ChangeEvent<HTMLTextAreaElement>) {
     event.target.setCustomValidity('');
     setNewCommentText(event.target.value);
   }
 
-  function handleNewCommentInvalid(event) {
+  function handleNewCommentInvalid(event: InvalidEvent<HTMLTextAreaElement>) {
     event.target.setCustomValidity('Esse campo é obrigatório.');
   }
 
-  function handleCreateNewComment(event) {
+  function handleCreateNewComment(event: FormEvent) {
     event.preventDefault();
 
     setComments([...comments, newCommentText]);
@@ -41,15 +60,13 @@ export function Post({ author, content, publishedAt }) {
     setNewCommentText('');
   }
 
-  function deleteComment(comment) {
+  function deleteComment(comment: string) {
     const commentsWithoutDeletedOne = comments.filter(
       (item) => item !== comment
     );
 
     setComments(commentsWithoutDeletedOne);
   }
-
-  const isNewCommentEmpty = newCommentText.length === 0;
 
   return (
     <article className={styles.post}>
